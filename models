@@ -1,0 +1,358 @@
+***
+93%
+
+
+siteid = fc.numeric_column('siteid')
+offerid = fc.numeric_column('offerid')
+category = fc.numeric_column('category')
+merchant = fc.numeric_column('merchant')
+
+
+
+countrycode = tf.feature_column.categorical_column_with_hash_bucket('countrycode', hash_bucket_size=1000)
+browserid = tf.feature_column.categorical_column_with_hash_bucket('browserid',hash_bucket_size=1000)
+devid = tf.feature_column.categorical_column_with_hash_bucket('devid',hash_bucket_size=1000)
+week_day_or_end = fc.categorical_column_with_vocabulary_list(
+    'day',
+    ['weekday','weekend'])
+
+
+crossed_columns = [
+    tf.feature_column.crossed_column(
+        ['merchant', 'offerid'], hash_bucket_size=1000),
+    tf.feature_column.crossed_column(
+        ['siteid','category'], hash_bucket_size=1000)
+]
+
+#my_numeric_columns = [siteid,offerid,category,merchant]
+my_categorical_columns = [countrycode,browserid,devid,week_day_or_end]
+
+
+classifier = tf.estimator.LinearClassifier(feature_columns=my_categorical_columns,model_dir='./log_reg_93')#,optimizer=tf.train.FtrlOptimizer(learning_rate=0.1))
+classifier.train(train_inpf)
+result = classifier.evaluate(test_inpf)
+
+for key,value in sorted(result.items()):
+  print('%s: %s' % (key, value))
+
+
+
+***
+93.7%
+
+
+siteid = fc.numeric_column('siteid')
+offerid = fc.numeric_column('offerid')
+category = fc.numeric_column('category')
+merchant = fc.numeric_column('merchant')
+time = fc.numeric_column('time')
+
+time_buckets = tf.feature_column.bucketized_column(
+    time, boundaries=[361,721,1081,1440])
+
+
+
+countrycode = tf.feature_column.categorical_column_with_hash_bucket('countrycode', hash_bucket_size=1000)
+browserid = tf.feature_column.categorical_column_with_hash_bucket('browserid',hash_bucket_size=1000)
+devid = tf.feature_column.categorical_column_with_hash_bucket('devid',hash_bucket_size=1000)
+week_day_or_end = fc.categorical_column_with_vocabulary_list(
+    'day',
+    ['weekday','weekend'])
+
+
+crossed_columns = [
+    tf.feature_column.crossed_column(
+        ['merchant', 'offerid'], hash_bucket_size=1000),
+    tf.feature_column.crossed_column(
+        ['siteid','category'], hash_bucket_size=1000)
+]
+
+#my_numeric_columns = [siteid,offerid,category,merchant]
+my_numeric_columns = [time_buckets]
+my_categorical_columns = [countrycode,browserid,devid,week_day_or_end]
+
+
+
+#classifier = tf.estimator.LinearClassifier(feature_columns=my_categorical_columns,model_dir='./log_reg_93')#,optimizer=tf.train.FtrlOptimizer(learning_rate=0.1))
+classifier = tf.estimator.LinearClassifier(feature_columns=my_numeric_columns+my_categorical_columns)
+classifier.train(train_inpf)
+result = classifier.evaluate(test_inpf)
+
+for key,value in sorted(result.items()):
+  print('%s: %s' % (key, value))
+
+
+
+***
+95.5%
+
+siteid = fc.numeric_column('siteid')
+offerid = fc.numeric_column('offerid')
+category = fc.numeric_column('category')
+merchant = fc.numeric_column('merchant')
+time = fc.numeric_column('time')
+
+time_buckets = tf.feature_column.bucketized_column(
+    time, boundaries=[361,721,1081,1440])
+
+
+
+countrycode = tf.feature_column.categorical_column_with_hash_bucket('countrycode', hash_bucket_size=1000)
+browserid = tf.feature_column.categorical_column_with_hash_bucket('browserid',hash_bucket_size=1000)
+devid = tf.feature_column.categorical_column_with_hash_bucket('devid',hash_bucket_size=1000)
+week_day_or_end = fc.categorical_column_with_vocabulary_list(
+    'day',
+    ['weekday','weekend'])
+
+'''
+crossed_columns = [
+    tf.feature_column.crossed_column(
+        ['merchant', 'offerid'], hash_bucket_size=1000),
+    tf.feature_column.crossed_column(
+        ['siteid','category'], hash_bucket_size=1000)
+]
+'''
+
+crossed_columns = [
+    tf.feature_column.crossed_column(
+    [time_buckets,week_day_or_end],hash_bucket_size=1000)
+]
+
+
+#my_numeric_columns = [siteid,offerid,category,merchant]
+my_numeric_columns = [time_buckets]
+my_categorical_columns = [countrycode,browserid,devid,week_day_or_end]
+
+
+#classifier = tf.estimator.LinearClassifier(feature_columns=my_categorical_columns,model_dir='./log_reg_93')#,optimizer=tf.train.FtrlOptimizer(learning_rate=0.1))
+classifier = tf.estimator.LinearClassifier(feature_columns=my_numeric_columns+my_categorical_columns+crossed_columns)
+classifier.train(train_inpf)
+result = classifier.evaluate(test_inpf)
+
+for key,value in sorted(result.items()):
+  print('%s: %s' % (key, value))
+
+
+***
+accuracy: 0.9369172
+accuracy_baseline: 0.84695554
+auc: 0.9571413
+auc_precision_recall: 0.8605608
+average_loss: 0.18072763
+global_step: 57
+label/mean: 0.15304443
+loss: 11.360912
+precision: 0.8727273
+prediction/mean: 0.15473562
+recall: 0.68817204
+
+siteid = fc.numeric_column('siteid')
+offerid = fc.numeric_column('offerid')
+category = fc.numeric_column('category')
+merchant = fc.numeric_column('merchant')
+time = fc.numeric_column('time')
+
+time_buckets = tf.feature_column.bucketized_column(
+    time, boundaries=[361,721,1081,1440])
+
+
+
+#countrycode = tf.feature_column.categorical_column_with_hash_bucket('countrycode', hash_bucket_size=1000)
+countrycode = tf.feature_column.categorical_column_with_vocabulary_list('countrycode', ['b', 'c', 'a', 'd', 'e', 'f'])
+#browserid = tf.feature_column.categorical_column_with_hash_bucket('browserid',hash_bucket_size=1000)
+browserid = tf.feature_column.categorical_column_with_vocabulary_list('browserid', ['Safari', 'Opera', 'Mozilla Firefox', 'Internet Explorer', 'Google Chrome', 'Edge'])
+#devid = tf.feature_column.categorical_column_with_hash_bucket('devid',hash_bucket_size=1000)
+devid = tf.feature_column.categorical_column_with_vocabulary_list('devid', ['Desktop','Tablet','Mobile'])
+week_day_or_end = fc.categorical_column_with_vocabulary_list(
+    'day',
+    ['weekday','weekend'])
+
+'''
+crossed_columns = [
+    tf.feature_column.crossed_column(
+        ['merchant', 'offerid'], hash_bucket_size=1000),
+    tf.feature_column.crossed_column(
+        ['siteid','category'], hash_bucket_size=1000)
+]
+'''
+
+crossed_columns = [
+    tf.feature_column.crossed_column(
+    [time_buckets,week_day_or_end],hash_bucket_size=1000)
+]
+
+
+#my_numeric_columns = [siteid,offerid,category,merchant]
+my_numeric_columns = [time_buckets]
+my_categorical_columns = [countrycode,browserid,devid,week_day_or_end]
+
+
+#classifier = tf.estimator.LinearClassifier(feature_columns=my_categorical_columns,model_dir='./log_reg_93')#,optimizer=tf.train.FtrlOptimizer(learning_rate=0.1))
+classifier = tf.estimator.LinearClassifier(feature_columns=my_numeric_columns+my_categorical_columns+crossed_columns)
+classifier.train(train_inpf)
+result = classifier.evaluate(test_inpf)
+
+for key,value in sorted(result.items()):
+  print('%s: %s' % (key, value))
+
+
+***
+accuracy: 0.9396599
+accuracy_baseline: 0.84695554
+auc: 0.9586305
+auc_precision_recall: 0.8655052
+average_loss: 0.17334618
+global_step: 57
+label/mean: 0.15304443
+loss: 10.896899
+precision: 0.8689956
+prediction/mean: 0.16004948
+recall: 0.71326166
+
+
+
+siteid = fc.numeric_column('siteid')
+offerid = fc.numeric_column('offerid')
+category = fc.numeric_column('category')
+merchant = fc.numeric_column('merchant')
+time = fc.numeric_column('time')
+
+time_buckets = tf.feature_column.bucketized_column(
+    time, boundaries=[361,721,1081,1440])
+
+
+
+#countrycode = tf.feature_column.categorical_column_with_hash_bucket('countrycode', hash_bucket_size=1000)
+countrycode = tf.feature_column.categorical_column_with_vocabulary_list('countrycode', ['b', 'c', 'a', 'd', 'e', 'f'])
+#browserid = tf.feature_column.categorical_column_with_hash_bucket('browserid',hash_bucket_size=1000)
+browserid = tf.feature_column.categorical_column_with_vocabulary_list('browserid', ['Safari', 'Opera', 'Mozilla Firefox', 'Internet Explorer', 'Google Chrome', 'Edge'])
+#devid = tf.feature_column.categorical_column_with_hash_bucket('devid',hash_bucket_size=1000)
+devid = tf.feature_column.categorical_column_with_vocabulary_list('devid', ['Desktop','Tablet','Mobile'])
+week_day_or_end = fc.categorical_column_with_vocabulary_list(
+    'day',
+    ['weekday','weekend'])
+
+'''
+crossed_columns = [
+    tf.feature_column.crossed_column(
+        ['merchant', 'offerid'], hash_bucket_size=1000),
+    tf.feature_column.crossed_column(
+        ['siteid','category'], hash_bucket_size=1000)
+]
+'''
+
+crossed_columns = [
+    tf.feature_column.crossed_column(
+    [time_buckets,week_day_or_end],hash_bucket_size=500)
+    ,tf.feature_column.crossed_column(
+    [countrycode,time_buckets],hash_bucket_size=1000)
+]
+
+
+#my_numeric_columns = [siteid,offerid,category,merchant]
+my_numeric_columns = [time_buckets]
+my_categorical_columns = [countrycode,browserid,devid,week_day_or_end]
+
+
+#classifier = tf.estimator.LinearClassifier(feature_columns=my_categorical_columns,model_dir='./log_reg_93')#,optimizer=tf.train.FtrlOptimizer(learning_rate=0.1))
+classifier = tf.estimator.LinearClassifier(feature_columns=my_numeric_columns+my_categorical_columns+crossed_columns)
+classifier.train(train_inpf)
+result = classifier.evaluate(test_inpf)
+
+for key,value in sorted(result.items()):
+  print('%s: %s' % (key, value))
+
+
+
+
+
+
+**************
+Current --
+
+
+
+siteid = fc.numeric_column('siteid')
+offerid = fc.numeric_column('offerid')
+category = fc.numeric_column('category')
+merchant = fc.numeric_column('merchant')
+time = fc.numeric_column('time')
+
+time_buckets = tf.feature_column.bucketized_column(
+    time, boundaries=[361,721,1081,1440])
+
+
+
+#countrycode = tf.feature_column.categorical_column_with_hash_bucket('countrycode', hash_bucket_size=1000)
+countrycode = tf.feature_column.categorical_column_with_vocabulary_list('countrycode', ['b', 'c', 'a', 'd', 'e', 'f'])
+#browserid = tf.feature_column.categorical_column_with_hash_bucket('browserid',hash_bucket_size=1000)
+browserid = tf.feature_column.categorical_column_with_vocabulary_list('browserid', ['Safari', 'Opera', 'Mozilla Firefox', 'Internet Explorer', 'Google Chrome', 'Edge'])
+#devid = tf.feature_column.categorical_column_with_hash_bucket('devid',hash_bucket_size=1000)
+devid = tf.feature_column.categorical_column_with_vocabulary_list('devid', ['Desktop','Tablet','Mobile'])
+week_day_or_end = fc.categorical_column_with_vocabulary_list(
+    'day',
+    ['weekday','weekend'])
+
+'''
+crossed_columns = [
+    tf.feature_column.crossed_column(
+        ['merchant', 'offerid'], hash_bucket_size=1000),
+    tf.feature_column.crossed_column(
+        ['siteid','category'], hash_bucket_size=1000)
+]
+'''
+
+crossed_columns = [
+    tf.feature_column.crossed_column(
+    [time_buckets,week_day_or_end],hash_bucket_size=1000)
+    #,tf.feature_column.crossed_column(
+    #[browserid,devid],hash_bucket_size=1000)
+]
+
+
+#my_numeric_columns = [siteid,offerid,category,merchant]
+my_numeric_columns = [time_buckets]
+my_categorical_columns = [countrycode,browserid,devid,week_day_or_end]
+
+
+
+#classifier = tf.estimator.LinearClassifier(feature_columns=my_categorical_columns,model_dir='./log_reg_93')#,optimizer=tf.train.FtrlOptimizer(learning_rate=0.1))
+classifier = tf.estimator.LinearClassifier(feature_columns=my_numeric_columns+my_categorical_columns+crossed_columns)
+classifier.train(train_inpf)
+result = classifier.evaluate(test_inpf)
+
+for key,value in sorted(result.items()):
+  print('%s: %s' % (key, value))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
