@@ -1,3 +1,5 @@
+#Drawing conclusions about the dataset using week-day/end and time of the day
+
 import pandas as pd
 
 df = pd.read_csv('train_balanced.csv')
@@ -34,7 +36,11 @@ conf_weekend_1 = len(day_anal1_we)/(len(day_anal0_we)+len(day_anal1_we))
 weekend = [sup_weekend,conf_weekend_0,conf_weekend_1,conf_weekend_0/sup0,conf_weekend_1/sup1]
 
 print("\n\n\n\n")
+print("Week day information")
+print("support(weekday) , conf(weekday,click=0),conf(weekday,click=1),lift(weekday,click=0),lift(weekday,click=1)")
 print(weekday)
+print("Weekend information")
+print("support(weekend) , conf(weekend,click=0),conf(weekend,click=1),lift(weekend,click=0),lift(weekday,click=1)")
 print(weekend)
 
 q1 = [i for i in x if i[-1]<361]
@@ -50,15 +56,6 @@ for i in range(len(quarters)):
     a1 = [j for j in quarters[i] if j[0]==1]
     print(i+1,"\t",len(a0)/(len(a0)+len(a1)),"\t",len(a1)/(len(a0)+len(a1)))
     
-
-
-
-
-
-
-
-
-
 
 
 
