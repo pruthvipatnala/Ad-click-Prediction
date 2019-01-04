@@ -1,3 +1,7 @@
+#preprocessing original dataset (train_set.csv)
+
+#Coming up with rules to replace missing values based on support confidence etc.
+
 
 import pandas as pd
 import numpy as np
@@ -11,6 +15,7 @@ k = list(train_df['devid'])
 devices = [i for i in list(set(k)) if type(i)==type('str')]
 devices = [(i,k.count(i)) for i in devices]
 #number of missing values=1274 in devid
+
 
 x = []
 for i in range(len(k)):
@@ -306,6 +311,9 @@ df_balance = df_balance.sample(frac=1)
 
 df_balance.to_csv("train_balanced1.csv", sep=',', encoding='utf-8')
 '''
+
+#Converting date-time to weekday/weekend
+#Generation of a new attribute using datetime column
 
 import datetime
 def get_date_time(s):
